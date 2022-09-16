@@ -6,6 +6,9 @@ let quizSchema = mongoose.Schema({
     optionC:{required:true, type:String},
     optionD:{required:true, type:String},
     correctAnswer:{required:true, type:String},
+    token:{required:true, type:String},
+    tofind:{required:true, type:String},
+    uid:{required:true, type:Number}
 
 
 })

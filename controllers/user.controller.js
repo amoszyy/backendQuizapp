@@ -50,7 +50,7 @@ const authenticateUser = (req, res)=>{
                         res.send({message:"Server error", status:false})
                     } else{
                         if(same){
-                            res.send({message:"user logged in successfully", status:true})
+                            res.send({user, message:"user logged in successfully", status:true})
                             console.log("correct")
                         } else{
                             res.send({message:"wrong password",status:false})
@@ -66,4 +66,80 @@ const authenticateUser = (req, res)=>{
         }
     })
 }
-module.exports = {getLandingPage, registerUser, authenticateUser}
+const getDashboard = (req, res)=>{
+    let {token} = req.body
+    console.log(req.body)
+    quizuserModel.findOne({_id:token}, (err, result)=>{
+        if(err){
+            res.send({message:"couldn't find user"})
+            console.log("session timed out")
+        } else{
+            res.send({message:"user found", result})
+        }
+    })
+
+}
+
+const setTest = (req, res)=>{
+    let {question, optionA, optionB, optionC, optionD, correctAnswer, token, tofind, uid} = req.body
+    // console.log(req.body)
+    quizuserModel.findOne({_id:token}, (err, result)=>{
+
+    })
+    let form = new quizModel(req.body)
+    form.save((err, data)=>{
+        if(err){
+            res.send({message:"unable to save question", err})
+            console.log(err)
+        }else{
+            res.send({message:"question saved", data})
+        }
+    })
+
+
+}
+const getQuestion = (req, res)=>{
+    let {tofind, token}= req.body
+    console.log(req.body)
+    quizModel.find({tofind:tofind}, (err, result)=>{
+        if(err){
+            res.send({message:"error occured",  err})
+        } else{
+            if(!result){
+                res.send({message:"no questions"})
+
+            } else{
+                res.send({message:"here are the questions", result})
+                console.log(result)
+            }
+            
+        }
+    })
+
+}
+const checkAnswer = (req, res)=>{
+    let {uid, answer} =req.body
+    quizModel.findOne({uid:uid}, (err, result)=>{
+        if(err){
+            res.send({message:"error occured while trying to process the question", err})
+        } else{
+            if(!result){
+                res.send({message:"couldn't find the question", status:false})
+
+            } else{
+                res.send({message:"this is the question and it's answer", result, status:true})
+                quizModel.find({correctAnswer:answer}, (err, data)=>{
+                    if(err){
+                        res.send({message:"error occured while trying to process the answer", err})
+
+                    } else{
+                        res.send({message:"found the answer", status:true})
+                    }
+                })
+            }
+        }
+    })
+
+}
+
+module.exports = {getLandingPage, registerUser, authenticateUser, setTest, getDashboard, getQuestion, checkAnswer}
